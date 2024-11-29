@@ -55,4 +55,7 @@ for i in operaciones :
 
 model.solve()
 print(LpStatus[model.status])
-
+for i in operaciones : 
+    for j in quirofranos : 
+        if x[(i,j)] == 1 : 
+            print (i, j)
