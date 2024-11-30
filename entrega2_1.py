@@ -40,27 +40,30 @@ for i in range(len(operaciones)):
             L[operaciones[i]].append(operaciones[j])
             L[operaciones[j]].append(operaciones[i])
 
-## Modelo en Pulp
+print(df_costes)
 
-model = LpProblem("Affectacion_operaciones", LpMinimize)
-x = LpVariable.dicts("x", [(i,j) for i in operaciones for j in quirofranos], cat ='Binary')
 
-# Objetivo
-model += lpSum([df_costes.loc[j, i]*x[(i,j)] for i in operaciones for j in quirofranos])
+# ## Modelo en Pulp
 
-# Restricción 1
-for i in operaciones:
-    model += lpSum(x[(i,j)] for j in quirofranos) >= 1
+# model = LpProblem("Affectacion_operaciones", LpMinimize)
+# x = LpVariable.dicts("x", [(i,j) for i in operaciones for j in quirofranos], cat ='Binary')
 
-# Restricción 2
-for i in operaciones:
-    for j in quirofranos: 
-        model += lpSum([x[(h, j)] for h in L[i]]) + x[(i,j)] <= 1
+# # Objetivo
+# model += lpSum([df_costes.loc[j, i]*x[(i,j)] for i in operaciones for j in quirofranos])
 
-model.solve(PULP_CBC_CMD(msg=False))
-print(LpStatus[model.status])
-print(value(model.objective))
-for j in quirofranos: 
-    for i in operaciones: 
-        if x[(i,j)].varValue == 1: 
-            print (i, j)
+# # Restricción 1
+# for i in operaciones:
+#     model += lpSum(x[(i,j)] for j in quirofranos) >= 1
+
+# # Restricción 2
+# for i in operaciones:
+#     for j in quirofranos: 
+#         model += lpSum([x[(h, j)] for h in L[i]]) + x[(i,j)] <= 1
+
+# model.solve(PULP_CBC_CMD(msg=False))
+# print(LpStatus[model.status])
+# print(value(model.objective))
+# for j in quirofranos: 
+#     for i in operaciones: 
+#         if x[(i,j)].varValue == 1: 
+#             print (i, j)
