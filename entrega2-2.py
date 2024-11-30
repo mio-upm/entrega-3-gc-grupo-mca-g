@@ -70,13 +70,18 @@ def generacion_planificacion(operaciones, L):
         if not esAfectado:
             plannificaciones.append([i])
     return plannificaciones
-                   
+
+
 # print(len(generacion_planificacion(operaciones, L)))
 
 A = generacion_planificacion(operaciones, L)
 
+planificacion_dict = {i: plan for i, plan in enumerate(A)}
+
+#print(planificacion_dict)
+
 def B(i,k):
-    if i in k :
+    if i in planificacion_dict[k] :
         return 1
     else :
         return 0
@@ -93,14 +98,21 @@ print(C_chapeau("OP-68"))
 def C(k) :
     s = 0
     for i in operaciones :
-        s = s + B[(i,k)] * C_chapeau(i)
+        s = s + B(i,k) * C_chapeau(i)
     return s
 
 model = LpProblem("Set_covering", LpMinimize)
 
-y = LpVariable.dicts("y", [k for k in A], cat ='Binary')
+y = LpVariable.dicts("y", planificacion_dict.keys(), cat ='Binary')
 
-model += lpSum ([y[k]*C(k) for k in A])
+model += lpSum ([y[k]*C(k) for k in planificacion_dict])
 
 for i in operaciones :
-    model += lpSum([y[k]*B(i,k) for k in A]) >= 1
+    model += lpSum([y[k]*B(i,k) for k in planificacion_dict]) >= 1
+
+model.solve()
+print(LpStatus[model.status])
+print(value(model.objective))
+for k in planificacion_dict : 
+    if y[k].varValue == 1 :
+        print(planificacion_dict[k])
