@@ -39,7 +39,7 @@ for i in range(len(operaciones)):
             or hora_inicio_j >= hora_inicio_i and hora_fin_j <= hora_fin_i): #Si la operación j empieza después de que empiece la operación i y acaba antes de que acabe la operación i
             L[operaciones[i]].append(operaciones[j])
             L[operaciones[j]].append(operaciones[i])
-
+print(L)
 ## Modelo en Pulp
 
 model = LpProblem("Affectacion_operaciones", LpMinimize)

@@ -19,16 +19,16 @@ df_operaciones['Hora inicio '] = pd.to_datetime(df_operaciones['Hora inicio '], 
 df_operaciones['Hora fin'] = pd.to_datetime(df_operaciones['Hora fin'], format='%I:%M %p', errors='coerce').dt.strftime('%H:%M')
 
 # Selección de las operaciones de Cardiología Pediátrica, Cirugía Cardíaca Pediátrica, Cirugía Cardiovascular, Cirugía General y del Aparato Digestivo
-especialidades = [
-    "Cardiología Pediátrica", 
-    "Cirugía Cardíaca Pediátrica", 
-    "Cirugía Cardiovascular", 
-    "Cirugía General y del Aparato Digestivo"
-]
-df_operaciones = df_operaciones[df_operaciones['Especialidad quirúrgica'].isin(especialidades)]
-df_costes = df_costes[df_costes.columns.intersection(df_operaciones.index)]
-# df_operaciones = df_operaciones[df_operaciones["Especialidad quirúrgica"] == "Cardiología Pediátrica"]
+# especialidades = [
+#     "Cardiología Pediátrica", 
+#     "Cirugía Cardíaca Pediátrica", 
+#     "Cirugía Cardiovascular", 
+#     "Cirugía General y del Aparato Digestivo"
+# ]
+# df_operaciones = df_operaciones[df_operaciones['Especialidad quirúrgica'].isin(especialidades)]
 # df_costes = df_costes[df_costes.columns.intersection(df_operaciones.index)]
+df_operaciones = df_operaciones[df_operaciones["Especialidad quirúrgica"] == "Cardiología Pediátrica"]
+df_costes = df_costes[df_costes.columns.intersection(df_operaciones.index)]
 
 #Creación de las listas de operaciones y quirofanos
 operaciones = df_operaciones.index.to_list()
@@ -42,9 +42,9 @@ for i in range(len(operaciones)):
     for j in range (i + 1, len(operaciones)):
         hora_inicio_j = df_operaciones.loc[operaciones[j], "Hora inicio "]
         hora_fin_j = df_operaciones.loc[operaciones[j], "Hora fin"]
-        if (hora_inicio_j <= hora_inicio_i and hora_fin_j >= hora_inicio_i #Si la operación j empieza antes de que acabe la operación i y acaba después de que empiece la operación i
-            or hora_inicio_j <= hora_fin_i and hora_fin_j >= hora_fin_i #Si la operación j empieza antes de que acabe la operación i y acaba después de que acabe la operación i
-            or hora_inicio_j >= hora_inicio_i and hora_fin_j <= hora_fin_i): #Si la operación j empieza después de que empiece la operación i y acaba antes de que acabe la operación i
+        if (hora_inicio_j < hora_inicio_i and hora_fin_j > hora_inicio_i #Si la operación j empieza antes de que acabe la operación i y acaba después de que empiece la operación i
+            or hora_inicio_j < hora_fin_i and hora_fin_j > hora_fin_i #Si la operación j empieza antes de que acabe la operación i y acaba después de que acabe la operación i
+            or hora_inicio_j > hora_inicio_i and hora_fin_j < hora_fin_i): #Si la operación j empieza después de que empiece la operación i y acaba antes de que acabe la operación i
             L[operaciones[i]].append(operaciones[j])
             L[operaciones[j]].append(operaciones[i])
 
@@ -73,7 +73,7 @@ def generacion_planificacion(operaciones, L):
     return plannificaciones
 
                     
-print(len(generacion_planificacion(operaciones, L)))
-
+# print(generacion_planificacion(operaciones, L))
+print(L)
                 
 
