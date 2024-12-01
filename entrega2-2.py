@@ -19,15 +19,13 @@ df_operaciones['Hora inicio '] = pd.to_datetime(df_operaciones['Hora inicio '], 
 df_operaciones['Hora fin'] = pd.to_datetime(df_operaciones['Hora fin'], format='%I:%M %p', errors='coerce').dt.strftime('%H:%M')
 
 # Selección de las operaciones de Cardiología Pediátrica, Cirugía Cardíaca Pediátrica, Cirugía Cardiovascular, Cirugía General y del Aparato Digestivo
-# especialidades = [
-#     "Cardiología Pediátrica", 
-#     "Cirugía Cardíaca Pediátrica", 
-#     "Cirugía Cardiovascular", 
-#     "Cirugía General y del Aparato Digestivo"
-# ]
-# df_operaciones = df_operaciones[df_operaciones['Especialidad quirúrgica'].isin(especialidades)]
-# df_costes = df_costes[df_costes.columns.intersection(df_operaciones.index)]
-df_operaciones = df_operaciones[df_operaciones["Especialidad quirúrgica"] == "Cardiología Pediátrica"]
+especialidades = [
+    "Cardiología Pediátrica", 
+    "Cirugía Cardíaca Pediátrica", 
+    "Cirugía Cardiovascular", 
+    "Cirugía General y del Aparato Digestivo"
+]
+df_operaciones = df_operaciones[df_operaciones['Especialidad quirúrgica'].isin(especialidades)]
 df_costes = df_costes[df_costes.columns.intersection(df_operaciones.index)]
 
 #Creación de las listas de operaciones y quirofanos
@@ -71,14 +69,11 @@ def generacion_planificacion(operaciones, L):
             plannificaciones.append([i])
     return plannificaciones
 
-
-# print(len(generacion_planificacion(operaciones, L)))
+print("oui", generacion_planificacion(operaciones, L))
 
 A = generacion_planificacion(operaciones, L)
 
 planificacion_dict = {i: plan for i, plan in enumerate(A)}
-
-#print(planificacion_dict)
 
 def B(i,k):
     if i in planificacion_dict[k] :
@@ -92,8 +87,6 @@ def C_chapeau(k) :
     for i in range (n) :
         s = s + df_costes.loc[quirofranos[i]][k]
     return s / n
-
-print(C_chapeau("OP-68"))
 
 def C(k) :
     s = 0
