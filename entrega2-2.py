@@ -63,17 +63,56 @@ def generacion_planificacion(operaciones, L):
                 for operacion in plannificaciones[p]:
                     if i in L[operacion]:
                         esIncompatible = True
-                        break  # Sortir dès qu'une incompatibilité est détectée
+                        break 
                 if not esIncompatible:
                     plannificaciones[p].append(i)
                     esAfectado = True
         if not esAfectado:
-            # Crée une nouvelle planification uniquement si aucune existante n'était compatible
             plannificaciones.append([i])
     return plannificaciones
 
-                    
-# print(generacion_planificacion(operaciones, L))
-print(L)
-                
 
+# print(len(generacion_planificacion(operaciones, L)))
+
+A = generacion_planificacion(operaciones, L)
+
+planificacion_dict = {i: plan for i, plan in enumerate(A)}
+
+#print(planificacion_dict)
+
+def B(i,k):
+    if i in planificacion_dict[k] :
+        return 1
+    else :
+        return 0
+
+def C_chapeau(k) :
+    n = len(quirofranos)
+    s = 0
+    for i in range (n) :
+        s = s + df_costes.loc[quirofranos[i]][k]
+    return s / n
+
+print(C_chapeau("OP-68"))
+
+def C(k) :
+    s = 0
+    for i in operaciones :
+        s = s + B(i,k) * C_chapeau(i)
+    return s
+
+model = LpProblem("Set_covering", LpMinimize)
+
+y = LpVariable.dicts("y", planificacion_dict.keys(), cat ='Binary')
+
+model += lpSum ([y[k]*C(k) for k in planificacion_dict])
+
+for i in operaciones :
+    model += lpSum([y[k]*B(i,k) for k in planificacion_dict]) >= 1
+
+model.solve()
+print(LpStatus[model.status])
+print(value(model.objective))
+for k in planificacion_dict : 
+    if y[k].varValue == 1 :
+        print(planificacion_dict[k])
