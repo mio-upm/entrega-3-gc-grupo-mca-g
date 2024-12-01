@@ -39,36 +39,29 @@ for i in range(len(operaciones)):
             or hora_inicio_j >= hora_inicio_i and hora_fin_j <= hora_fin_i): #Si la operación j empieza después de que empiece la operación i y acaba antes de que acabe la operación i
             L[operaciones[i]].append(operaciones[j])
             L[operaciones[j]].append(operaciones[i])
-<<<<<<< HEAD
 print(L)
+            
 ## Modelo en Pulp
-=======
 
-print(df_costes)
->>>>>>> 13878e5e1736eedadaa0e2a0730aa16dea2d8273
+model = LpProblem("Affectacion_operaciones", LpMinimize)
+x = LpVariable.dicts("x", [(i,j) for i in operaciones for j in quirofranos], cat ='Binary')
 
+# Objetivo
+model += lpSum([df_costes.loc[j, i]*x[(i,j)] for i in operaciones for j in quirofranos])
 
-# ## Modelo en Pulp
+# Restricción 1
+for i in operaciones:
+    model += lpSum(x[(i,j)] for j in quirofranos) >= 1
 
-# model = LpProblem("Affectacion_operaciones", LpMinimize)
-# x = LpVariable.dicts("x", [(i,j) for i in operaciones for j in quirofranos], cat ='Binary')
+# Restricción 2
+for i in operaciones:
+    for j in quirofranos: 
+        model += lpSum([x[(h, j)] for h in L[i]]) + x[(i,j)] <= 1
 
-# # Objetivo
-# model += lpSum([df_costes.loc[j, i]*x[(i,j)] for i in operaciones for j in quirofranos])
-
-# # Restricción 1
-# for i in operaciones:
-#     model += lpSum(x[(i,j)] for j in quirofranos) >= 1
-
-# # Restricción 2
-# for i in operaciones:
-#     for j in quirofranos: 
-#         model += lpSum([x[(h, j)] for h in L[i]]) + x[(i,j)] <= 1
-
-# model.solve(PULP_CBC_CMD(msg=False))
-# print(LpStatus[model.status])
-# print(value(model.objective))
-# for j in quirofranos: 
-#     for i in operaciones: 
-#         if x[(i,j)].varValue == 1: 
-#             print (i, j)
+model.solve(PULP_CBC_CMD(msg=False))
+print(LpStatus[model.status])
+print(value(model.objective))
+for j in quirofranos: 
+    for i in operaciones: 
+        if x[(i,j)].varValue == 1: 
+            print (i, j)
